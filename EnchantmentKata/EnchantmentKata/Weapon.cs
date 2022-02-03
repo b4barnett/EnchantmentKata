@@ -8,14 +8,27 @@ namespace EnchantmentKata
 {
     public class Weapon
     {
-        public string Name { get; set; }
-        public string AttackDamage { get; set; }
-        public string AttackSpeed { get; set; }
+        private readonly IEnchantmentProvider _enchantmentProvider;
+        private readonly string _baseWeaponName;
+        private string _weaponPrefix = String.Empty;
+
+        public Weapon( IEnchantmentProvider enchantmentProvider, string baseWeaponName )
+        {
+            _enchantmentProvider = enchantmentProvider;
+            _baseWeaponName = baseWeaponName;
+        }
+
+        public string Name => _weaponPrefix + _baseWeaponName;
+        public string AttackDamage { get; init; }
+        public string AttackSpeed { get; init; }
         public string Effect { get; private set; } = String.Empty;
 
         public void Enchant()
         {
-            throw new NotSupportedException();
+            var enchantment = _enchantmentProvider.GetRandomEnchantment();
+
+            _weaponPrefix = enchantment.Prefix;
+            Effect = enchantment.Effect;
         }
     }
 }

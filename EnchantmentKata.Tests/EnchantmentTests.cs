@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -14,15 +15,22 @@ namespace EnchantmentKata.Tests
         private const string BaseName = "Dagger of the Nooblet";
         private const string AttackDamage = "5 - 10 attack damage";
         private const string AttackSpeed = "1.2 attack speed";
+        private Dictionary<string, Enchantment> _enchantments;
+        private Mock<IEnchantmentProvider> _mockEnchantmentProvider;
 
         [ SetUp]
         public void Setup()
         {
-            _weapon = new Weapon()
+            _mockEnchantmentProvider = new Mock<IEnchantmentProvider>();
+            _weapon = new Weapon( _mockEnchantmentProvider.Object, BaseName )
             {
-                Name = BaseName,
                 AttackDamage = AttackDamage,
                 AttackSpeed = AttackSpeed
+            };
+
+            _enchantments = new Dictionary<string, Enchantment>()
+            { 
+                { "Fire", new Enchantment( "Fire", "Inferno ", "+5 fire damage" ) } 
             };
         }
 
@@ -36,16 +44,19 @@ namespace EnchantmentKata.Tests
         }
 
         //EnchantmentKey, Expected Name, Expected Effect
-        [TestCase( "Fire", "Inferno", "+5 fire damaage")]
-        [TestCase( "Ice", "Icy", "+5 ice damager")]
+        [TestCase( "Fire", "Inferno ", "+5 fire damage")]
+        [TestCase( "Ice", "Icy", "+5 ice damage")]
         [TestCase( "LifeSteal", "Vampire", "+5 life steal")]
         [TestCase( "Agility", "Quick", "+5 agility")]
         [TestCase( "Strength", "Angry", "+5 strength") ]
         public void EnchantmentTest( string enchantment, string name, string effect)
         {
+            _mockEnchantmentProvider.Setup( x => x.GetRandomEnchantment() )
+                                    .Returns( _enchantments[ enchantment ] );
+
             _weapon.Enchant();
 
-            _weapon.Name.Should().Be( name );
+            _weapon.Name.Should().Be( name + BaseName );
             _weapon.AttackDamage.Should().Be( AttackDamage );
             _weapon.AttackSpeed.Should().Be( AttackSpeed );
             _weapon.Effect.Should().Be( effect );
