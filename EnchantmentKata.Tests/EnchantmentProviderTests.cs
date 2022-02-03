@@ -18,7 +18,7 @@ namespace EnchantmentKata.Tests
         public void Setup()
         { 
             _randomNumberGenerator = new Mock<IRandomNumberGenerator>();
-            //_provider
+            _provider = new EnchantmentProvider( Helper.Enchantments.Values.ToList(), _randomNumberGenerator.Object );
         }
 
 
@@ -33,5 +33,6 @@ namespace EnchantmentKata.Tests
 
             _provider.GetRandomEnchantment().Name.Should().Be( enhancementName );
         }
+
     }
 }
