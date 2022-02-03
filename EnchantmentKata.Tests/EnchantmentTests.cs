@@ -65,5 +65,36 @@ namespace EnchantmentKata.Tests
             _weapon.AttackSpeed.Should().Be( AttackSpeed );
             _weapon.Effect.Should().Be( effect );
         }
+
+        [TestCase( "Ice", "Fire", "Inferno ", "+5 fire damage" )]
+        [TestCase( "Fire", "Ice", "Icy ", "+5 ice damage" )]
+        [TestCase( "Ice", "LifeSteal", "Vampire ", "+5 life steal" )]
+        [TestCase( "Ice", "Agility", "Quick ", "+5 agility" )]
+        [TestCase( "Ice", "Strength", "Angry ", "+5 strength" )]
+        public void RepeatEnchantmentTest( string startingEnchantment, string enchantment, string name, string effect )
+        {
+            Queue<string> enchantments = new Queue<string>();
+            enchantments.Enqueue( startingEnchantment );
+            enchantments.Enqueue( startingEnchantment );
+            enchantments.Enqueue( enchantment );
+
+            _mockEnchantmentProvider.Setup( x => x.GetRandomEnchantment() ).Returns( () => 
+            {
+                return _enchantments[ enchantments.Dequeue() ];
+            } );
+
+            //Setup the weapon to the starting enchantment
+            _weapon.Enchant();
+            _mockEnchantmentProvider.Verify( x => x.GetRandomEnchantment(), Times.Exactly( 1 ) );
+
+            _weapon.Enchant();//should attempt it twice
+
+            _weapon.Name.Should().Be( name + BaseName );
+            _weapon.AttackDamage.Should().Be( AttackDamage );
+            _weapon.AttackSpeed.Should().Be( AttackSpeed );
+            _weapon.Effect.Should().Be( effect );
+
+            _mockEnchantmentProvider.Verify( x => x.GetRandomEnchantment(), Times.Exactly( 3 ) );
+        }
     }
 }
