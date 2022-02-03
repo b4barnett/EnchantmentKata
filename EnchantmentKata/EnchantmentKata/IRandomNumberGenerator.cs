@@ -8,6 +8,10 @@ namespace EnchantmentKata
 {
     public interface IRandomNumberGenerator
     {
-        int GetNumber( int min, int max );
+        int GetNumber( int min, int max )
+        {
+            Random random = new Random();
+            return random.Next( min, max );
+        }
     }
 }
