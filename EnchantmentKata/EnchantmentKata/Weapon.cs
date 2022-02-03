@@ -12,11 +12,13 @@ namespace EnchantmentKata
         private readonly string _baseWeaponName;
         private string _weaponPrefix = String.Empty;
         private Enchantment _currentEnchantment;
+        private IRandomNumberGenerator _randomNumberGenerator;
 
-        public Weapon( IEnchantmentProvider enchantmentProvider, string baseWeaponName )
+        public Weapon( IEnchantmentProvider enchantmentProvider, string baseWeaponName, IRandomNumberGenerator randomNumberGenerator )
         {
             _enchantmentProvider = enchantmentProvider;
             _baseWeaponName = baseWeaponName;
+            _randomNumberGenerator = randomNumberGenerator;
         }
 
         public string Name => _currentEnchantment?.Prefix + _baseWeaponName;
@@ -26,12 +28,25 @@ namespace EnchantmentKata
 
         public void Enchant()
         {
+            //10% chance, this should probably be config
+            if ( _currentEnchantment != null && _randomNumberGenerator.GetNumber( 1, 10 ) == 10 )
+            {
+                _currentEnchantment = null;
+            }
+            else 
+            {
+                PerformEnchantment();
+            }
+        }
+
+        private void PerformEnchantment()
+        {
             Enchantment enchantment;
 
-            do 
+            do
             {
                 enchantment = _enchantmentProvider.GetRandomEnchantment();
-            }while( enchantment == _currentEnchantment );
+            } while ( enchantment == _currentEnchantment );
 
             _currentEnchantment = enchantment;
         }

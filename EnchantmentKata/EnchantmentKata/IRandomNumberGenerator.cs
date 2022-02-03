@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace EnchantmentKata
 {
-    public interface IEnchantmentProvider
+    public interface IRandomNumberGenerator
     {
-        Enchantment GetRandomEnchantment();
+        int GetNumber( int min, int max );
     }
 }

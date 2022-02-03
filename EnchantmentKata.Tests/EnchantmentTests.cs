@@ -17,12 +17,16 @@ namespace EnchantmentKata.Tests
         private const string AttackSpeed = "1.2 attack speed";
         private Dictionary<string, Enchantment> _enchantments;
         private Mock<IEnchantmentProvider> _mockEnchantmentProvider;
+        private Mock<IRandomNumberGenerator> _randomNumberGenerator;
 
-        [ SetUp]
+        [SetUp]
         public void Setup()
         {
             _mockEnchantmentProvider = new Mock<IEnchantmentProvider>();
-            _weapon = new Weapon( _mockEnchantmentProvider.Object, BaseName )
+            _randomNumberGenerator = new Mock<IRandomNumberGenerator>();
+            _randomNumberGenerator.Setup( x => x.GetNumber( It.IsAny<int>(), It.IsAny<int>() ) ).Returns( 1 );//default return to not remove enchantment
+
+            _weapon = new Weapon( _mockEnchantmentProvider.Object, BaseName, _randomNumberGenerator.Object )
             {
                 AttackDamage = AttackDamage,
                 AttackSpeed = AttackSpeed
@@ -95,6 +99,26 @@ namespace EnchantmentKata.Tests
             _weapon.Effect.Should().Be( effect );
 
             _mockEnchantmentProvider.Verify( x => x.GetRandomEnchantment(), Times.Exactly( 3 ) );
+        }
+
+        [Test]
+        public void ClearEnhancementTest()
+        {
+            _mockEnchantmentProvider.Setup( x => x.GetRandomEnchantment() )
+                        .Returns( _enchantments[ "Fire" ] );
+
+            _weapon.Enchant();
+
+            _weapon.Name.Should().Be( "Inferno " + BaseName );
+
+            _randomNumberGenerator.Setup( x => x.GetNumber( 1, 10 ) ).Returns( 10 );
+
+            _weapon.Enchant();
+
+            _weapon.Name.Should().Be( BaseName );
+            _weapon.AttackDamage.Should().Be( AttackDamage );
+            _weapon.AttackSpeed.Should().Be( AttackSpeed );
+            _weapon.Effect.Should().Be( String.Empty );
         }
     }
 }
