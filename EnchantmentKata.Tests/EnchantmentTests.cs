@@ -15,7 +15,6 @@ namespace EnchantmentKata.Tests
         private const string BaseName = "Dagger of the Nooblet";
         private const string AttackDamage = "5 - 10 attack damage";
         private const string AttackSpeed = "1.2 attack speed";
-        private Dictionary<string, Enchantment> _enchantments;
         private Mock<IEnchantmentProvider> _mockEnchantmentProvider;
         private Mock<IRandomNumberGenerator> _randomNumberGenerator;
 
@@ -30,15 +29,6 @@ namespace EnchantmentKata.Tests
             {
                 AttackDamage = AttackDamage,
                 AttackSpeed = AttackSpeed
-            };
-
-            _enchantments = new Dictionary<string, Enchantment>()
-            { 
-                { "Fire", new Enchantment( "Fire", "Inferno ", "+5 fire damage" ) },
-                { "Ice", new Enchantment( "Ice", "Icy ", "+5 ice damage" ) },
-                { "LifeSteal", new Enchantment( "LifeSteal", "Vampire ", "+5 life steal" ) },
-                { "Agility", new Enchantment( "Agility", "Quick ", "+5 agility") },
-                { "Strength", new Enchantment( "Strength", "Angry ", "+5 strength" ) }
             };
         }
 
@@ -60,7 +50,7 @@ namespace EnchantmentKata.Tests
         public void EnchantmentTest( string enchantment, string name, string effect)
         {
             _mockEnchantmentProvider.Setup( x => x.GetRandomEnchantment() )
-                                    .Returns( _enchantments[ enchantment ] );
+                                    .Returns( Helper.Enchantments[ enchantment ] );
 
             _weapon.Enchant();
 
@@ -84,7 +74,7 @@ namespace EnchantmentKata.Tests
 
             _mockEnchantmentProvider.Setup( x => x.GetRandomEnchantment() ).Returns( () => 
             {
-                return _enchantments[ enchantments.Dequeue() ];
+                return Helper.Enchantments[ enchantments.Dequeue() ];
             } );
 
             //Setup the weapon to the starting enchantment
@@ -105,7 +95,7 @@ namespace EnchantmentKata.Tests
         public void ClearEnhancementTest()
         {
             _mockEnchantmentProvider.Setup( x => x.GetRandomEnchantment() )
-                        .Returns( _enchantments[ "Fire" ] );
+                        .Returns( Helper.Enchantments[ "Fire" ] );
 
             _weapon.Enchant();
 
