@@ -11,6 +11,7 @@ namespace EnchantmentKata
         private readonly IEnchantmentProvider _enchantmentProvider;
         private readonly string _baseWeaponName;
         private string _weaponPrefix = String.Empty;
+        private Enchantment _currentEnchantment;
 
         public Weapon( IEnchantmentProvider enchantmentProvider, string baseWeaponName )
         {
@@ -18,17 +19,21 @@ namespace EnchantmentKata
             _baseWeaponName = baseWeaponName;
         }
 
-        public string Name => _weaponPrefix + _baseWeaponName;
+        public string Name => _currentEnchantment?.Prefix + _baseWeaponName;
         public string AttackDamage { get; init; }
         public string AttackSpeed { get; init; }
-        public string Effect { get; private set; } = String.Empty;
+        public string Effect => _currentEnchantment?.Effect ?? String.Empty;
 
         public void Enchant()
         {
-            var enchantment = _enchantmentProvider.GetRandomEnchantment();
+            Enchantment enchantment;
 
-            _weaponPrefix = enchantment.Prefix;
-            Effect = enchantment.Effect;
+            do 
+            {
+                enchantment = _enchantmentProvider.GetRandomEnchantment();
+            }while( enchantment == _currentEnchantment );
+
+            _currentEnchantment = enchantment;
         }
     }
 }
